@@ -8,6 +8,37 @@
 		<link rel="stylesheet" href="styles.css" />
 	</head>
 	<body>
+		<div class="card">
+			<strong class="card__title">Cliente</strong>
+
+			<form class="form">
+				<input
+					type="text"
+					placeholder="Mensagem"
+					id="message-input"
+					class="form__text-input"
+				/>
+
+				<button id="send-btn" class="button">Enviar</button>
+			</form>
+
+			<div class="output output--mt-a">
+				<strong> Última mensagem: </strong>
+				<span id="message-output"></span>
+			</div>
+		</div>
+
+		<div class="card">
+			<strong class="card__title">Servidor</strong>
+
+			<span class="socket-status" title="desconectado"></span>
+
+			<div class="output">
+				<strong> Última mensagem: </strong>
+				<span id="socket-output"></span>
+			</div>
+		</div>
+
 		<script type="module" src="main.js"></script>
 	</body>
 </html>
