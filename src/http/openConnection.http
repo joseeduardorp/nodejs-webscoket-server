@@ -1,0 +1,7 @@
+GET http://localhost:3001 HTTP/1.1
+Host: localhost:3001
+Upgrade: websocket
+Connection: Upgrade
+Sec-Websocket-Key: dGhlIHNhbXBsZSBub25jZQ==
+Sec-Websocket-Version: 13
+Origin: http://localhost:5500
