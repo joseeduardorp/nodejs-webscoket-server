@@ -15,7 +15,7 @@ socket.addEventListener('open', () => {
 });
 
 socket.addEventListener('message', (e) => {
-	console.log('onmessage:', e);
+	socketOutput.textContent = e.data;
 });
 
 socket.addEventListener('error', (e) => {

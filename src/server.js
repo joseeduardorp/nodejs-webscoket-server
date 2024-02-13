@@ -4,7 +4,6 @@ const { createHash } = require('node:crypto');
 const { StringDecoder } = require('node:string_decoder');
 
 const MAGIC_STRING = '258EAFA5-E914-47DA-95CA-C5AB0DC85B11';
-
 const LENGHT_BYTES = {
 	126: 2,
 	127: 8,
@@ -33,12 +32,22 @@ const readFrame = (frameBytes = []) => {
 	return byte1 === 129 ? decoder.write(unmasked_msg) : unmasked_msg;
 };
 
+const writeFrame = (data, opcode = 129) => {
+	const header = Buffer.alloc(2);
+	header[0] = opcode; // FIN + RSV1-3 + OPCODE
+	header[1] = Buffer.byteLength(data); // Payload Length
+
+	const payloadData = Buffer.from(data);
+
+	return Buffer.concat([header, payloadData]);
+};
+
 const socketHandler = (socket = Socket.prototype) => {
-	socket.on('data', async (data) => {
+	socket.on('data', (data) => {
 		const bytes = Array.from(data);
 
 		const msg = readFrame(bytes);
-		console.log(msg);
+		socket.write(writeFrame(msg));
 	});
 };
 
