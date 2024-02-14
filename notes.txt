@@ -1,0 +1,76 @@
+Referências:
+
+- https://datatracker.ietf.org/doc/html/rfc6455
+- https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API/Writing_WebSocket_servers
+
+================================================================================
+
+Fazer:
+
+- ler e manipular frames de controle:
+  - ping, pong (https://datatracker.ietf.org/doc/html/rfc6455#section-5.5.2)
+  - close (https://datatracker.ietf.org/doc/html/rfc6455#section-5.5.1)
+- ler frames fragmentados
+- melhorar leitura do payload length quando for igual 127
+
+--------------------------------------------------------------------------------
+
+Feito:
+
+- tentar entender por que o servidor não consegue enviar mensagens com acentos:
+  - motivo: a propriedade length conta apenas a quantidade de caracteres em uma
+  string, não levando em consideração quantos bytes cada caractere pode ter
+
+  ex: a letra 'e' ocupa 1 byte
+      a letra 'é' ocupa 2 bytes
+
+- servir conteúdo de 'public' sem necessitar da extensão
+
+================================================================================
+
+Anotações:
+
+byte1 pode ter os seguintes valores para um frame não fragmentado:
+
+FIN set + OPCODE 0x1 (text)   = 10000001 = 129
+FIN set + OPCODE 0x2 (binary) = 10000010 = 130
+FIN set + OPCODE 0x8 (close)  = 10001000 = 136
+FIN set + OPCODE 0x9 (ping)   = 10001001 = 137
+FIN set + OPCODE 0xA (pong)   = 10001010 = 138
+
+--------------------------------------------------------------------------------
+
+byte1 pode ter os seguintes valores para um frame fragmentado:
+
+FIN clear + OPCODE 0x1 (text)         = 00000001 = 1
+FIN clear + OPCODE 0x2 (binary)       = 00000010 = 2
+FIN clear + OPCODE 0x0 (continuation) = 00000000 = 0
+FIN set   + OPCODE 0x0 (terminate)    = 10000000 = 128
+
+--------------------------------------------------------------------------------
+
+Mascarando e desmascarando um frame:
+
+Octeto i dos dados transformados ("transformed_octet_i") é o XOR do octeto i dos
+dados originais ("original_octet_i") com octeto no índice i módulo 4 da chave de
+mascaramento ("masking_key_octet_j"):
+
+Ex:
+
+  mask: [ 253, 64, 17, 125 ]
+
+  masked_msg: [
+    144, 37, 127, 14, 156, 39,
+    116, 16, 221, 36, 126, 93,
+    158, 44, 120, 24, 147, 52,
+    116
+  ]
+
+  index = 0;
+
+  masked_msg[index] XOR mask[index % 4]
+  144 ^ [0 % 4]
+  144 ^ 1
+  109
+
+================================================================================
