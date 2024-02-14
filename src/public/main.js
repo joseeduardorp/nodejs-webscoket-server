@@ -5,7 +5,7 @@ const msgOutput = document.getElementById('message-output');
 const socketStatus = document.querySelector('.socket-status');
 const socketOutput = document.getElementById('socket-output');
 
-const socket = new WebSocket(`ws://${window.location.hostname}:3001`);
+const socket = new WebSocket(`ws://${window.location.hostname}:3001/socket`);
 
 socket.addEventListener('open', () => {
 	socket.send('cliente conectando...');

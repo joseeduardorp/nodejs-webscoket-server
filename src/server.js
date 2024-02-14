@@ -1,7 +1,8 @@
-const { createServer, IncomingMessage, ServerResponse } = require('node:http');
-const { Socket } = require('node:net');
+const { createServer, IncomingMessage, OutgoingMessage } = require('node:http');
 const { createHash } = require('node:crypto');
 const { StringDecoder } = require('node:string_decoder');
+
+const staticFilesHandler = require('./utils/staticFilesHandler');
 
 const MAGIC_STRING = '258EAFA5-E914-47DA-95CA-C5AB0DC85B11';
 const LENGHT_BYTES = {
@@ -42,20 +43,11 @@ const writeFrame = (data, opcode = 129) => {
 	return Buffer.concat([header, payloadData]);
 };
 
-const socketHandler = (socket = Socket.prototype) => {
-	socket.on('data', (data) => {
-		const bytes = Array.from(data);
-
-		const msg = readFrame(bytes);
-		socket.write(writeFrame(msg));
-	});
-};
-
-const handler = (
+const socketHandler = (
 	req = IncomingMessage.prototype,
-	res = ServerResponse.prototype
+	res = OutgoingMessage.prototype
 ) => {
-	const { httpVersion, headers, socket } = req;
+	const { headers, httpVersion, socket } = req;
 
 	const {
 		host,
@@ -98,10 +90,23 @@ const handler = (
 	});
 	res.end();
 
-	socketHandler(socket);
+	socket.on('data', (data) => {
+		const bytes = Array.from(data);
+
+		const msg = readFrame(bytes);
+		socket.write(writeFrame(msg));
+	});
 };
 
-const server = createServer(handler);
+const server = createServer((req, res) => {
+	const { url } = req;
+
+	if (url === '/socket') {
+		socketHandler(req, res);
+	} else {
+		staticFilesHandler(req, res);
+	}
+});
 
 server.listen(3001, () => {
 	console.log('Server is running on port 3001.\n');
