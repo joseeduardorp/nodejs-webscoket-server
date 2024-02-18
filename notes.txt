@@ -8,8 +8,8 @@ Referências:
 Fazer:
 
 - ler e manipular frames de controle:
-  - ping, pong (https://datatracker.ietf.org/doc/html/rfc6455#section-5.5.2)
   - close (https://datatracker.ietf.org/doc/html/rfc6455#section-5.5.1)
+  - ping, pong (https://datatracker.ietf.org/doc/html/rfc6455#section-5.5.2)
 - ler frames fragmentados
 - melhorar leitura do payload length quando for igual 127
 
@@ -72,5 +72,24 @@ Ex:
   144 ^ [0 % 4]
   144 ^ 1
   109
+
+--------------------------------------------------------------------------------
+
+Close frame:
+
+- PODE ter um body com o motivo do fechamento
+- se tiver um body:
+  - os dois primeiros bytes DEVEM que ser um inteiro sem sinal indicando o
+  status code
+  - seguido do status code, PODE ter uma string com o motivo do fechamento
+- a aplicação não DEVE enviar mais nenhum dado após o close frame
+- se um endpoint receber um close frame, ele DEVE enviar outro em resposta com o
+mesmo status code
+- normalmente, o servidor DEVE fechar a conexão primeiro, pois ele que mantém a
+informação sobre o tempo de conexão do cliente
+- se o close frame não possui nenhum status code, é usado o status code 1005
+- se nenhum close frame for recebido, é usado o status code 1006
+
+CONTINUAR DAQUI: https://datatracker.ietf.org/doc/html/rfc6455#section-7.2
 
 ================================================================================

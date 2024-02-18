@@ -23,7 +23,8 @@ body {
 
 .card {
 	padding: 2rem;
-	width: 30rem;
+	max-width: 35rem;
+	min-width: 30rem;
 	min-height: 35rem;
 	background-color: #fff;
 	border-radius: 1rem;
@@ -80,10 +81,6 @@ body {
 	font-size: 1.4rem;
 }
 
-.output--mt-a {
-	margin-top: auto;
-}
-
 .socket-status {
 	width: 2rem;
 	height: 2rem;
@@ -98,4 +95,15 @@ body {
 
 .socket-status--connected {
 	background: #080;
+}
+
+.mt-a {
+	margin-top: auto;
+}
+
+.h-wrapper {
+	width: 100%;
+	display: flex;
+	justify-content: space-between;
+	gap: 1rem;
 }

@@ -1,7 +1,7 @@
 const { IncomingMessage, OutgoingMessage } = require('node:http');
 const { createHash } = require('node:crypto');
 
-const { readFrame, writeFrame } = require('../utils/frameUtils');
+const fu = require('../utils/frameUtils');
 const validSocketHeaders = require('../utils/validSocketHeaders');
 
 const MAGIC_STRING = '258EAFA5-E914-47DA-95CA-C5AB0DC85B11';
@@ -38,9 +38,35 @@ const socketHandler = (
 
 	socket.on('data', (data) => {
 		const bytes = Array.from(data);
+		const msg = fu.readFrame(bytes);
 
-		const msg = readFrame(bytes);
-		socket.write(writeFrame(msg));
+		console.log('msg:', msg.data, '\n');
+
+		switch (msg.type) {
+			case 'close':
+				const { code, reason } = msg.data;
+
+				socket.write(fu.writeCloseFrame(code, reason));
+				socket.end();
+				break;
+			default:
+				socket.write(fu.writeFrame(msg.data));
+				break;
+		}
+	});
+
+	socket.on('error', (err) => {
+		console.log('='.repeat(50));
+		console.log('Ocorreu um erro:', err.message);
+		console.log('='.repeat(50));
+	});
+
+	socket.on('close', (hasErr) => {
+		if (hasErr) {
+			console.log('\nConexão fechada por causa de um erro');
+		} else {
+			console.log('\nConexão fechada');
+		}
 	});
 };
 
